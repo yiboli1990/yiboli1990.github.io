@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Average MPG by Make - Scene 3</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .bar-city {
+            fill: steelblue;
+        }
+        .bar-highway {
+            fill: orange;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            width: 120px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Average MPG by Maker - Unveiling Efficiency Trends Across Car Makers</h1>
+    <p>Our final scene provides a brand-based perspective on car efficiency, showcasing the average Highway and City MPG for cars from different manufacturers, ranging from accross the wrold.</p>
+    <p>You can interact with the data by using the 'City' and 'Highway' buttons, switching the display between City MPG and Highway MPG averages for each car make. For detailed figures, hover over the bars in the chart to reveal the precise average MPG values.</p>
+    <p>This chart highlights a striking range in fuel efficiency between different manufacturers. Some brands consistently deliver higher MPG averages, suggesting a stronger focus on fuel-efficient engineering.</p>
+
+    <div id="buttons">
+        <button id="cityButton">City</button>
+        <button id="highwayButton">Highway</button>
+    </div>
+    <div id="scene_three"></div>
+    <div class="button-group">
+        <button onclick="window.location.href='scene2.html'">Previous</button>
+        <button onclick="window.location.href='index.html'">Back to Index</button>
+    </div>
+
+    <script>
+      const CSV_URL = "https://flunky.github.io/cars2017.csv";
+        const width = 710, height = 530;
+        const margin = {top: 50, right: 50, bottom: 120, left: 70};
+
+        var xScale = d3.scaleBand().rangeRound([margin.left, width - margin.right]).padding(0.1);
+        var yScale = d3.scaleLinear().rangeRound([height - margin.bottom, margin.top]);
+        var svg, tooltip, data;
+
+        function initializeSvg() {
+            d3.select("svg").remove();
+
+            svg = d3.select("#scene_three").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            tooltip = d3.select("body").append("div")
+                .attr("class", "tooltip")
+                .style("opacity", 0);
+        }
+        var minNoted;
+        function drawChart(type) {
+            var barClass = type === "city" ? "bar-city" : "bar-highway";
+            initializeSvg();
+            
+            minNoted = false;
+
+            var displayData = data.map(function(d) {
+                return {key: d.key, value: type === "city" ? d.avgCityMPG : d.avgHighwayMPG};
+            });
+
+            displayData.sort(function(a, b) { return d3.descending(a.value, b.value); });
+
+            var maxValue = d3.max(displayData, function(d) { return d.value; });
+            var minValue = d3.min(displayData, function(d) { return d.value; });
+
+            xScale.domain(displayData.map(function(d) { return d.key; }));
+            yScale.domain([0, maxValue]);
+
+            var barClass = type === "city" ? "bar-city" : "bar-highway";
+
+            svg.selectAll(".bar")
+                .data(displayData)
+                .enter().append("rect")
+                .attr("class", barClass)
+                .attr("x", function(d) { return xScale(d.key); })
+                .attr("y", function(d) { return yScale(d.value); })
+                .attr("width", xScale.bandwidth())
+                .attr("height", function(d) { return height - yScale(d.value) - margin.bottom; })
+                .on("mouseover", function(event, d) {
+                    tooltip.transition()
+                        .duration(200)
+                        .style("opacity", .9);
+                    tooltip.html("Make: " + d.key + "<br>Avg MPG: " + d.value.toFixed(2))
+                        .style("left", (event.pageX) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function(d) {
+                    tooltip.transition()
+                        .duration(500)
+                        .style("opacity", 0);
+                });
+
+            svg.append("g")
+                .attr("transform", "translate(0," + (height - margin.bottom) + ")")
+                .call(d3.axisBottom(xScale))
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+                .attr("transform", "rotate(-90)");
+
+            svg.append("g")
+                .attr("transform", "translate(" + margin.left + ",0)")
+                .call(d3.axisLeft(yScale));
+
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Average MPG");
+
+            svg.append("text")
+                .attr("transform", "translate(" + (width/2) + " ," + (height - margin.bottom/3) + ")")
+                .style("text-anchor", "middle")
+                .text("Car Maker");
+
+            svg.selectAll(".text")
+                .data(displayData)
+                .enter()
+                .append("text")
+                .attr("x", (function(d) { return xScale(d.key) + xScale.bandwidth()/2 ;  }))
+                .attr("y", function(d) { return yScale(d.value) - 20; })
+                .style("text-anchor", "middle")
+                .style("font-size", "13px")
+                .text(function(d) { 
+                    if (d.value === maxValue) {
+                        return "Max: " + d.value.toFixed(2);
+                    } else if (d.value === minValue && !minNoted) {
+                        minNoted = true;
+                        return "Min: " + d.value.toFixed(2);
+                    }
+                    return "";
+                })
+                .call(function(text) {
+                    text.filter(function(d) { return d.value === maxValue || d.value === minValue; })
+                        .each(function(d) {
+                            svg.append("line")
+                                .style("stroke", "black")
+                                .style("stroke-width", 1)
+                                .attr("x1", xScale(d.key) + xScale.bandwidth()/2)
+                                .attr("y1", yScale(d.value) - 15)
+                                .attr("x2", xScale(d.key) + xScale.bandwidth()/2)
+                                .attr("y2", yScale(d.value) - 5);
+                        })
+                });
+            
+            svg.append("line")          
+                .style("stroke", "black")
+                .style("stroke-dasharray", ("3, 3"))  // set the line to be dotted
+                .style("stroke-width", 1)
+                .attr("x1", margin.left)
+                .attr("y1", yScale(23))
+                .attr("x2", width - margin.right)
+                .attr("y2", yScale(23));
+
+            svg.append("text")
+                .attr("x", width - margin.right)
+                .attr("y", yScale(23) - 20)
+                .style("text-anchor", "end")
+                .style("font-size", "14px")
+                .text("Good MPG");
+        }
+
+        d3.csv(CSV_URL).then(function(csvData) {
+            csvData.forEach(function(d) {
+                d.AverageHighwayMPG = +d.AverageHighwayMPG;
+                d.AverageCityMPG = +d.AverageCityMPG;
+            });
+
+            var dataByMake = d3.group(csvData, d => d.Make);
+            data = Array.from(dataByMake, ([key, values]) => {
+                var avgHighwayMPG = d3.mean(values, d => d.AverageHighwayMPG);
+                var avgCityMPG = d3.mean(values, d => d.AverageCityMPG);
+                return {key, avgHighwayMPG, avgCityMPG};
+            });
+
+            drawChart("city");
+        });
+
+        d3.select("#cityButton").on("click", function() {
+            drawChart("city");
+        });
+
+        d3.select("#highwayButton").on("click", function() {
+            drawChart("highway");
+        });
+    </script>
+</body>
+</html>

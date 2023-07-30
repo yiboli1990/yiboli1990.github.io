@@ -1,0 +1,129 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+    font-size:xx-large;
+}
+
+h2 {
+    color: #333;
+    margin-top: 0.2em;
+    margin-bottom: 1.2em;
+}
+
+h3 {
+    color: #333;
+    font-size: 22px;
+    margin-bottom: 0.6em;
+}
+
+h4 {
+    color: #333;
+    font-size: 22px;
+    margin-top: 0.2em;
+    margin-bottom: 0.6em;
+}
+
+p {
+    margin-top: 0.0em;
+    margin-bottom: 0.3em;
+}
+
+#buttons {
+    margin-bottom: 20px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#cityButton {
+    background-color: steelblue;
+    color: white;
+}
+
+#cityButton:hover {
+    background-color: darkblue;
+}
+
+#highwayButton {
+    background-color: orange;
+    color: white;
+}
+
+#highwayButton:hover {
+    background-color: darkorange;
+}
+
+#cityButton, #highwayButton {
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+.bar-city {
+    fill: steelblue;
+}
+
+.bar-highway {
+    fill: orange;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: 120px;
+    height: 28px;
+    padding: 2px;
+    font: 12px sans-serif;
+    background: lightsteelblue;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: -20px; 
+}
+
+.button-group button {
+    margin-right: 10px;
+    background-color: #dbd8d8;
+    transition: background-color 0.3s ease;
+}
+
+.button-group button:hover {
+    background-color: #9b9898;
+}
+
+.button-group2 {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; 
+}
+
+.button-group2 button {
+    margin-right: 10px;
+    background-color: #dbd8d8;
+    transition: background-color 0.3s ease;
+}
+
+.button-group2 button:hover {
+    background-color: #9b9898;
+}
